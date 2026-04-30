@@ -29,7 +29,7 @@ export default function PortalSelect() {
           </button>
         ))}
 
-        <p className="text-xs text-gray-400 mt-8">© 2026 GreatStack. All rights reserved.</p>
+        <p className="text-xs text-gray-400 mt-8">© 2026 aggi sanjay. All rights reserved.</p>
       </div>
     </div>
   );
