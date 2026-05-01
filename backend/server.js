@@ -6,7 +6,14 @@ import routes from "./routes/index.js";
 import { inngestMiddleware } from "./inngest/index.js";
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ["https://employee-management-system-8n74.vercel.app", "http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+app.options("*", cors()); // Handle preflight
+
 app.use(express.json());
 
 app.use("/api/inngest", inngestMiddleware);
