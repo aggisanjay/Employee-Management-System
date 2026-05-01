@@ -22,13 +22,16 @@ export const login = async (req, res) => {
       token,
       user: {
         id: user._id,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
         role: user.role,
         position: user.position,
         department: user.department,
+        phone: user.phone,
       },
     });
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
