@@ -11,6 +11,7 @@ export default function Leave() {
   const [counts, setCounts] = useState({ SICK: 0, CASUAL: 0, ANNUAL: 0 });
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ type: "SICK", fromDate: "", toDate: "", reason: "" });
+  const [loading, setLoading] = useState(false);
 
   const load = async () => {
     if (isAdmin) {
@@ -26,12 +27,17 @@ export default function Leave() {
 
   const apply = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await api.post("/leaves", form);
       toast.success("Leave applied");
       setShowModal(false);
       load();
-    } catch (err) { toast.error("Failed"); }
+    } catch (err) { 
+      toast.error("Failed"); 
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateStatus = async (id, status) => {
@@ -98,7 +104,7 @@ export default function Leave() {
           <tbody>
             {leaves.map((l) => (
               <tr key={l._id} className="border-t">
-                {isAdmin && <td className="p-4">{l.employee?.name}</td>}
+                {isAdmin && <td className="p-4">{l.employee?.firstName ? `${l.employee.firstName} ${l.employee.lastName}` : l.employee?.name}</td>}
                 <td className="p-4"><span className="px-3 py-1 bg-gray-100 rounded text-xs font-medium">{l.type}</span></td>
                 <td className="p-4 text-gray-600">{fmt(l.fromDate)} — {fmt(l.toDate)}</td>
                 <td className="p-4 text-gray-600">{l.reason}</td>
@@ -143,7 +149,9 @@ export default function Leave() {
             <div className="flex gap-3">
               <button type="button" onClick={() => setShowModal(false)}
                 className="flex-1 p-3 border border-gray-200 rounded-lg">Cancel</button>
-              <button type="submit" className="flex-1 p-3 bg-primary text-white rounded-lg">Apply</button>
+              <button type="submit" disabled={loading} className={`flex-1 p-3 bg-primary text-white rounded-lg flex items-center justify-center gap-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : "Apply"}
+              </button>
             </div>
           </form>
         </div>

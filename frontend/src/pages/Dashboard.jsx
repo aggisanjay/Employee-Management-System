@@ -32,7 +32,9 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">Welcome, {user?.name?.split(" ")[0]}!</h1>
+      <h1 className="text-3xl font-bold">Welcome, {user?.firstName || user?.name?.split(" ")[0]}!</h1>
+
+
       <p className="text-gray-500 mb-8">{user?.position} - {user?.department}</p>
       <div className="grid grid-cols-3 gap-5 mb-6">
         <StatCard icon={Calendar} label="Days Present" value={data.daysPresent ?? 0} />

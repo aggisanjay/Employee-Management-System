@@ -13,6 +13,7 @@ export default function Payslips() {
   const [employees, setEmployees] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ employeeId: "", period: "", basicSalary: 0, allowances: 0, deductions: 0 });
+  const [loading, setLoading] = useState(false);
 
   const load = async () => {
     const url = isAdmin ? "/payslips" : "/payslips/me";
@@ -27,12 +28,17 @@ export default function Payslips() {
 
   const generate = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await api.post("/payslips", form);
       toast.success("Payslip generated");
       setShowModal(false);
       load();
-    } catch { toast.error("Failed"); }
+    } catch { 
+      toast.error("Failed"); 
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,7 +70,7 @@ export default function Payslips() {
           <tbody>
             {payslips.map((p) => (
               <tr key={p._id} className="border-t">
-                {isAdmin && <td className="p-4">{p.employee?.name}</td>}
+                {isAdmin && <td className="p-4">{p.employee?.firstName ? `${p.employee.firstName} ${p.employee.lastName}` : p.employee?.name}</td>}
                 <td className="p-4 text-gray-600">{p.period}</td>
                 <td className="p-4">${p.basicSalary.toLocaleString()}</td>
                 <td className="p-4">${p.netSalary.toLocaleString()}</td>
@@ -88,7 +94,7 @@ export default function Payslips() {
               onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
               className="w-full p-3 mb-3 border border-gray-200 rounded-lg">
               <option value="">Select Employee</option>
-              {employees.map((e) => <option key={e._id} value={e._id}>{e.name}</option>)}
+              {employees.map((e) => <option key={e._id} value={e._id}>{e.firstName ? `${e.firstName} ${e.lastName}` : e.name}</option>)}
             </select>
             <input required placeholder="Period (e.g. February 2026)" value={form.period}
               onChange={(e) => setForm({ ...form, period: e.target.value })}
@@ -105,7 +111,9 @@ export default function Payslips() {
             <div className="flex gap-3">
               <button type="button" onClick={() => setShowModal(false)}
                 className="flex-1 p-3 border border-gray-200 rounded-lg">Cancel</button>
-              <button type="submit" className="flex-1 p-3 bg-primary text-white rounded-lg">Generate</button>
+              <button type="submit" disabled={loading} className={`flex-1 p-3 bg-primary text-white rounded-lg flex items-center justify-center gap-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : "Generate"}
+              </button>
             </div>
           </form>
         </div>

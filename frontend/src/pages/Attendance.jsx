@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 export default function Attendance() {
   const [data, setData] = useState({ records: [], daysPresent: 0, lateArrivals: 0, avgHours: 0, activeRecord: null });
   const [timer, setTimer] = useState("00:00:00");
+  const [loading, setLoading] = useState(false);
 
   const load = () => api.get("/attendance/me").then((r) => setData(r.data));
   useEffect(() => { load(); }, []);
@@ -29,12 +30,17 @@ export default function Attendance() {
   }, [data.activeRecord]);
 
   const handleAction = async () => {
+    setLoading(true);
     try {
       const url = data.activeRecord ? "/attendance/checkout" : "/attendance/checkin";
       await api.post(url);
       toast.success(data.activeRecord ? "Checked out!" : "Checked in!");
       load();
-    } catch (e) { toast.error(e.response?.data?.message || "Failed"); }
+    } catch (e) { 
+      toast.error(e.response?.data?.message || "Failed"); 
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fmt = (d) => d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "-";
@@ -94,9 +100,10 @@ export default function Attendance() {
         </table>
       </div>
 
-      <button onClick={handleAction}
-        className={`fixed bottom-8 right-8 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 transition-transform hover:scale-105 active:scale-95 ${data.activeRecord ? 'bg-red-500' : 'bg-primary'}`}>
-        {data.activeRecord ? <LogOut size={20} /> : <LogIn size={20} />}
+      <button onClick={handleAction} disabled={loading}
+        className={`fixed bottom-8 right-8 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 transition-transform hover:scale-105 active:scale-95 ${data.activeRecord ? 'bg-red-500' : 'bg-primary'} ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}>
+        {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : (data.activeRecord ? <LogOut size={20} /> : <LogIn size={20} />)}
+
         <div className="text-left">
           <p className="font-semibold">{data.activeRecord ? 'Clock Out' : 'Clock In'}</p>
           <p className="text-xs opacity-80">{data.activeRecord ? 'finish your day' : 'start your work day'}</p>

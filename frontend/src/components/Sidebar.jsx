@@ -39,10 +39,12 @@ export default function Sidebar() {
       <div className="p-4 border-b border-white/10">
         <div className="flex items-center gap-3 p-2 bg-white/5 rounded-lg">
           <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center font-semibold">
-            {user?.name?.[0] || "U"}
+            {user?.firstName ? `${user.firstName[0]}${user.lastName?.[0] || ''}` : (user?.name?.[0] || 'U')}
           </div>
           <div>
-            <p className="font-medium text-sm">{user?.name}</p>
+            <p className="font-medium text-sm">{user?.firstName ? `${user.firstName} ${user.lastName}` : user?.name}</p>
+
+
             <p className="text-xs text-white/50 capitalize">
               {user?.role === "admin" ? "Administrator" : "Employee"}
             </p>

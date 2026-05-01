@@ -16,7 +16,7 @@ export const myPayslips = async (req, res) => {
 };
 
 export const allPayslips = async (req, res) => {
-  const payslips = await Payslip.find().populate("employee", "name email").sort({ createdAt: -1 });
+  const payslips = await Payslip.find().populate("employee", "firstName lastName email department").sort({ createdAt: -1 });
   res.json(payslips);
 };
 

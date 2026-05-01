@@ -8,13 +8,15 @@ export default function Employees() {
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState({ name: "", email: "", password: "", position: "", department: "Engineering", salary: 0 });
+  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "", position: "", department: "Engineering", salary: 0, phone: "" });
+  const [loading, setLoading] = useState(false);
 
   const load = () => api.get(`/employees?search=${search}`).then((r) => setEmployees(r.data));
   useEffect(() => { load(); }, [search]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       if (editingId) {
         await api.put(`/employees/${editingId}`, form);
@@ -25,7 +27,11 @@ export default function Employees() {
       }
       closeModal();
       load();
-    } catch (err) { toast.error(err.response?.data?.message || "Failed"); }
+    } catch (err) { 
+      toast.error(err.response?.data?.message || "Failed"); 
+    } finally {
+      setLoading(false);
+    }
   };
 
   const deleteEmp = async (id) => {
@@ -46,7 +52,7 @@ export default function Employees() {
   const closeModal = () => {
     setShowModal(false);
     setEditingId(null);
-    setForm({ name: "", email: "", password: "", position: "", department: "Engineering", salary: 0 });
+    setForm({ firstName: "", lastName: "", email: "", password: "", position: "", department: "Engineering", salary: 0, phone: "" });
   };
 
   return (
@@ -93,9 +99,10 @@ export default function Employees() {
 
             <div className="flex flex-col items-center pb-6 border-b border-gray-50">
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-primary flex items-center justify-center text-2xl font-bold text-white shadow-lg shadow-primary/30 mb-4 group-hover:scale-110 transition-transform duration-300">
-                {e.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                {e.firstName?.[0] || e.name?.[0] || "U"}{e.lastName?.[0] || ""}
               </div>
-              <h3 className="font-bold text-xl text-gray-800">{e.name}</h3>
+              <h3 className="font-bold text-xl text-gray-800">{e.firstName ? `${e.firstName} ${e.lastName}` : e.name}</h3>
+
               <p className="text-gray-400 flex items-center gap-1.5 text-sm mt-1 uppercase tracking-tight font-medium">
                 <Briefcase size={12} /> {e.position}
               </p>
@@ -116,15 +123,29 @@ export default function Employees() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
           <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-200">
             <h2 className="text-2xl font-bold mb-6">{editingId ? "Edit Employee" : "Add Employee"}</h2>
             <div className="space-y-4">
-              {["name", "email", "password", "position", "department"].map((f) => (
+            <div className="grid grid-cols-2 gap-4">
+              {["firstName", "lastName"].map((f) => (
+                <div key={f}>
+                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">{f.replace(/([A-Z])/g, ' $1')}</label>
+                  <input
+                    required
+                    value={form[f]}
+                    onChange={(e) => setForm({ ...form, [f]: e.target.value })}
+                    className="w-full p-3 mt-1 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-primary focus:bg-white transition"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="space-y-4 mt-4">
+              {["email", "password", "position", "department", "phone"].map((f) => (
                 <div key={f}>
                   <label className="text-xs font-bold text-gray-400 uppercase ml-1">{f}</label>
                   <input
-                    required={f !== "department" && (!editingId || f !== "password")}
+                    required={f !== "department" && f !== "phone" && (!editingId || f !== "password")}
                     type={f === "password" ? "password" : "text"}
                     placeholder={editingId && f === "password" ? "Leave blank to keep current" : ""}
                     value={form[f]}
@@ -146,12 +167,15 @@ export default function Employees() {
             <div className="flex gap-3 mt-8">
               <button type="button" onClick={closeModal}
                 className="flex-1 p-3 border border-gray-200 rounded-xl font-medium hover:bg-gray-50 transition">Cancel</button>
-              <button type="submit"
-                className="flex-1 p-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition shadow-lg shadow-primary/20">
-                {editingId ? "Update" : "Create"}
+              <button type="submit" disabled={loading}
+                className={`flex-1 p-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition shadow-lg shadow-primary/20 flex items-center justify-center gap-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : (editingId ? "Update" : "Create")}
               </button>
             </div>
-          </form>
+          </div>
+        </form>
+
+
         </div>
       )}
     </div>

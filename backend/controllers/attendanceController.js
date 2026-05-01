@@ -1,4 +1,5 @@
 import Attendance from "../models/Attendance.js";
+import { sendEmail } from "../utils/mailer.js";
 
 export const checkIn = async (req, res) => {
   const today = new Date();
@@ -16,6 +17,21 @@ export const checkIn = async (req, res) => {
     checkIn: new Date(),
     status: "PRESENT",
   });
+
+  // Send immediate check-in email
+  const firstName = req.user.firstName;
+  await sendEmail(
+    req.user.email,
+    "Check-in Confirmation",
+    null,
+    `<div style="font-family: Arial, sans-serif; max-width: 600px;">
+      <h2>Hi ${firstName}, 👋</h2>
+      <p>You have successfully checked in today.</p>
+      <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
+      <p>Have a great day at work!</p>
+    </div>`
+  );
+
   res.json(record);
 };
 
@@ -31,6 +47,22 @@ export const checkOut = async (req, res) => {
   record.workingHours = +(ms / (1000 * 60 * 60)).toFixed(2);
   record.dayType = record.workingHours >= 6 ? "Full Day" : "Half Day";
   await record.save();
+
+  // Send immediate check-out email
+  const firstName = req.user.firstName;
+  await sendEmail(
+    req.user.email,
+    "Check-out Confirmation",
+    null,
+    `<div style="font-family: Arial, sans-serif; max-width: 600px;">
+      <h2>Hi ${firstName}, 👋</h2>
+      <p>You have successfully checked out for the day.</p>
+      <p><strong>Time:</strong> ${record.checkOut.toLocaleTimeString()}</p>
+      <p><strong>Working Hours:</strong> ${record.workingHours}h</p>
+      <p>See you tomorrow!</p>
+    </div>`
+  );
+
   res.json(record);
 };
 

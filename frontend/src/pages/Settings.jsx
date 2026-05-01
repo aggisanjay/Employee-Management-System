@@ -8,10 +8,12 @@ export default function Settings() {
   const { user, setUser } = useAuth();
   const isAdmin = user?.role === "admin";
   const [form, setForm] = useState({
-    name: user?.name || "",
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
     email: user?.email || "",
     position: user?.position || "",
     bio: user?.bio || "",
+    phone: user?.phone || "",
   });
   const [showPwd, setShowPwd] = useState(false);
   const [pwd, setPwd] = useState({ oldPassword: "", newPassword: "" });
@@ -47,13 +49,25 @@ export default function Settings() {
         </div>
         <div className="grid grid-cols-2 gap-5 mb-5">
           <div>
-            <label className="text-sm font-medium">Full Name</label>
-            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+            <label className="text-sm font-medium">First Name</label>
+            <input value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })}
               className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
           </div>
           <div>
+            <label className="text-sm font-medium">Last Name</label>
+            <input value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+              className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-5 mb-5">
+          <div>
             <label className="text-sm font-medium">Email</label>
             <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
+          </div>
+          <div>
+            <label className="text-sm font-medium">Phone</label>
+            <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
               className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-lg outline-none" />
           </div>
         </div>

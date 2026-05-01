@@ -12,7 +12,8 @@ const seed = async () => {
   }
   const hashed = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
   await Employee.create({
-    name: "John Doe",
+    firstName: "Admin",
+    lastName: "User",
     email: process.env.ADMIN_EMAIL,
     password: hashed,
     role: "admin",
@@ -20,6 +21,7 @@ const seed = async () => {
     department: "Engineering",
     salary: 5000,
   });
+
   console.log("✅ Admin created");
   process.exit(0);
 };
