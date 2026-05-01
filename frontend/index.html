@@ -5,10 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <title>Employee MS</title>
-
+    <style>
+      #root:empty + #app-loader {
+        display: flex;
+      }
+      #app-loader {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: #f8fafc;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e2e8f0;
+        border-top: 4px solid #6366f1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .loader-text {
+        margin-top: 20px;
+        font-family: sans-serif;
+        font-weight: 600;
+        color: #64748b;
+        letter-spacing: 0.05em;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="app-loader">
+      <div className="spinner"></div>
+      <p className="loader-text">INITIALIZING EMS...</p>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

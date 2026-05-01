@@ -14,7 +14,13 @@ import Settings from "./pages/Settings";
 
 const PrivateRoute = ({ children, adminOnly }) => {
   const { user, loading } = useAuth();
-  if (loading) return <div className="p-10">Loading...</div>;
+  if (loading) return (
+    <div className="fixed inset-0 bg-slate-50 flex flex-col items-center justify-center z-[9999]">
+      <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+      <p className="text-slate-500 font-bold tracking-widest text-xs animate-pulse">AUTHENTICATING...</p>
+    </div>
+  );
+
   if (!user) return <Navigate to="/" replace />;
   if (adminOnly && user.role !== "admin") return <Navigate to="/dashboard" replace />;
   return children;
