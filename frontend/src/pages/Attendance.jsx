@@ -3,13 +3,15 @@ import { Calendar, AlertCircle, Clock, LogIn, LogOut } from "lucide-react";
 import api from "../utils/api";
 import StatCard from "../components/StatCard";
 import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 
 export default function Attendance() {
   const [data, setData] = useState({ records: [], daysPresent: 0, lateArrivals: 0, avgHours: 0, activeRecord: null });
   const [timer, setTimer] = useState("00:00:00");
   const [loading, setLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
-  const load = () => api.get("/attendance/me").then((r) => setData(r.data));
+  const load = () => api.get("/attendance/me").then((r) => setData(r.data)).finally(() => setIsFetching(false));
   useEffect(() => { load(); }, []);
 
   useEffect(() => {
@@ -72,6 +74,7 @@ export default function Attendance() {
         <StatCard icon={Clock} label="Avg. Work Hrs" value={data.avgHours} suffix="Hrs" />
       </div>
 
+      {isFetching ? <Loader /> : (
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <h2 className="font-semibold p-5 border-b">Recent Activity</h2>
         <table className="w-full">
@@ -99,6 +102,8 @@ export default function Attendance() {
           </tbody>
         </table>
       </div>
+      )}
+
 
       <button onClick={handleAction} disabled={loading}
         className={`fixed bottom-8 right-8 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 transition-transform hover:scale-105 active:scale-95 ${data.activeRecord ? 'bg-red-500' : 'bg-primary'} ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}>

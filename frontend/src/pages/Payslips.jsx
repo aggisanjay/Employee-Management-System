@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 
 export default function Payslips() {
   const { user } = useAuth();
@@ -14,12 +15,16 @@ export default function Payslips() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ employeeId: "", period: "", basicSalary: 0, allowances: 0, deductions: 0 });
   const [loading, setLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   const load = async () => {
+    setIsFetching(true);
     const url = isAdmin ? "/payslips" : "/payslips/me";
     const { data } = await api.get(url);
     setPayslips(data);
+    setIsFetching(false);
   };
+
 
   useEffect(() => {
     load();
@@ -56,6 +61,7 @@ export default function Payslips() {
         )}
       </div>
 
+      {isFetching ? <Loader /> : (
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
@@ -85,6 +91,8 @@ export default function Payslips() {
           </tbody>
         </table>
       </div>
+      )}
+
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

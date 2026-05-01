@@ -3,6 +3,7 @@ import { Plus, Thermometer, Umbrella, Palmtree, Check, X } from "lucide-react";
 import api from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 
 export default function Leave() {
   const { user } = useAuth();
@@ -12,8 +13,10 @@ export default function Leave() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ type: "SICK", fromDate: "", toDate: "", reason: "" });
   const [loading, setLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   const load = async () => {
+    setIsFetching(true);
     if (isAdmin) {
       const { data } = await api.get("/leaves");
       setLeaves(data);
@@ -22,7 +25,9 @@ export default function Leave() {
       setLeaves(data.leaves);
       setCounts(data.counts);
     }
+    setIsFetching(false);
   };
+
   useEffect(() => { load(); }, [isAdmin]);
 
   const apply = async (e) => {
@@ -89,6 +94,7 @@ export default function Leave() {
         </div>
       )}
 
+      {isFetching ? <Loader /> : (
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
@@ -126,6 +132,8 @@ export default function Leave() {
           </tbody>
         </table>
       </div>
+      )}
+
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

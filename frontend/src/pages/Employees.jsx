@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2, Mail, Wallet, Briefcase } from "lucide-react";
 import api from "../utils/api";
 import toast from "react-hot-toast";
+import Loader from "../components/Loader";
 
 export default function Employees() {
   const [employees, setEmployees] = useState([]);
@@ -10,8 +11,9 @@ export default function Employees() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "", position: "", department: "Engineering", salary: 0, phone: "" });
   const [loading, setLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
-  const load = () => api.get(`/employees?search=${search}`).then((r) => setEmployees(r.data));
+  const load = () => api.get(`/employees?search=${search}`).then((r) => setEmployees(r.data)).finally(() => setIsFetching(false));
   useEffect(() => { load(); }, [search]);
 
   const handleSubmit = async (e) => {
@@ -86,6 +88,7 @@ export default function Employees() {
         </select>
       </div>
 
+      {isFetching ? <Loader /> : (
       <div className="grid grid-cols-3 gap-6">
         {employees.map((e) => (
           <div key={e._id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden group hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 relative border-t-4 border-t-primary/20">
@@ -121,6 +124,8 @@ export default function Employees() {
           </div>
         ))}
       </div>
+      )}
+
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">

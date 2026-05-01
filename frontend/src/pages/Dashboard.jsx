@@ -4,16 +4,21 @@ import { Users, Building2, Calendar, FileText, DollarSign, ArrowRight } from "lu
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import StatCard from "../components/StatCard";
+import Loader from "../components/Loader";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const nav = useNavigate();
   const [data, setData] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const url = user?.role === "admin" ? "/dashboard/admin" : "/dashboard/employee";
-    api.get(url).then((r) => setData(r.data));
+    api.get(url).then((r) => setData(r.data)).finally(() => setLoading(false));
   }, [user]);
+
+  if (loading) return <Loader />;
+
 
   if (user?.role === "admin") {
     return (
