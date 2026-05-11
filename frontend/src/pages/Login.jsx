@@ -69,10 +69,34 @@ export default function Login() {
             </div>
           </div>
           <button disabled={loading}
-            className="w-full bg-primary text-white p-3 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50">
+            className="w-full bg-primary text-white p-3 rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
+          >
             {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
+
+        {portal === "admin" && (
+          <div className="mt-8 p-4 bg-blue-50 border border-blue-100 rounded-xl">
+            <h3 className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
+              <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+              Admin Demo Access
+            </h3>
+            <p className="text-xs text-blue-700 mb-3">Click on the credentials below to auto-fill</p>
+            <div 
+              onClick={() => setForm({ email: "admin@ems.com", password: "admin123" })}
+              className="group cursor-pointer space-y-1 hover:bg-blue-100/50 p-2 rounded-lg transition-colors border border-dashed border-blue-200"
+            >
+              <div className="flex justify-between text-xs">
+                <span className="text-blue-600 font-medium">Email:</span>
+                <span className="text-blue-900 font-mono">admin@ems.com</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-blue-600 font-medium">Password:</span>
+                <span className="text-blue-900 font-mono">admin123</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
